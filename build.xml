@@ -25,7 +25,7 @@
 
     <target name="jar" depends="compile">
     	<buildnumber/>
-    	<jar destfile="${artifactsDir}/${app.name}-${app.version}-build-${build.number}.jar"
+    	<jar destfile="${artifactsDir}/${app.name}-${app.version}-build.${build.number}.jar"
     		basedir="${outputDir}">
     		<manifest>
 	    		<attribute name="Created-By" value="oyagev" />
@@ -45,4 +45,3 @@
     </target>
 
 </project>
-
