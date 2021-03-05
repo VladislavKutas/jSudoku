@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jSudoku" basedir="." default="jar">
+	<property name="app.name" value="jSudoku"/>
+	<property name="app.description" value="Java implementation of Sudoku game"/>
+	<property name="app.version" value="1.3"/>
+	<property name="app.mainClassName" value="oyg/sudoku/CreateSudokuGUI" />
+    <property name="sourceDir" value="src" />
+    <property name="outputDir" value="classes" />
+    <property name="artifactsDir" value="artifacts" />
+	     
+
+    <target name="clean">
+     	<delete dir="${outputDir}" />
+     	<delete dir="${artifactsDir}" />
+   	</target>
+   	 
+    <target name="init" depends="clean">
+     	<mkdir dir="${outputDir}" />
+     	<mkdir dir="${artifactsDir}" />
+    </target>
+
+   	<target name="compile" depends="init">
+    	<javac srcdir="${sourceDir}" destdir="${outputDir}" />
+    </target>
+
+    <target name="jar" depends="compile">
+    	<buildnumber/>
+    	<jar destfile="${artifactsDir}/${app.name}-${app.version}-build-${build.number}.jar"
+    		basedir="${outputDir}">
+    		<manifest>
+	    		<attribute name="Created-By" value="oyagev" />
+	            <attribute name="Specification-Title" value="${app.description}" />
+	            <attribute name="Specification-Version" value="${app.version}" />
+	            <attribute name="Specification-Vendor" value="vkutas" />
+	            <attribute name="Implementation-Title" value="${app.name} ${app.version}" />
+	            <attribute name="Implementation-Version" value="${app.version}" />
+	            <attribute name="Implementation-Vendor" value="vkutas" />
+	            <attribute name="Main-Class" value="${app.mainClassName}" />
+    	</manifest>	
+    	</jar>
+    </target>
+
+    <target name="post-clean" depends="compile, jar">
+    	<delete dir="${outputDir}" />
+    </target>
+
+</project>
+
