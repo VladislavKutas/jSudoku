@@ -36,7 +36,7 @@
 
 
     <target name="checkstyle" depends="init-checks"
-    	description="Generates a report of code convention violations.">
+    	description="Generates a report of code convention violations." >
 		<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${build.checkstyleClassPath}" />
 		<checkstyle config="${build.checkstyleRulesPath}" >
 			<formatter type="xml" tofile="${build.reportsDir}/checkstyle_report-${app.version}-b.${build.number}.xml"/>
@@ -55,8 +55,7 @@
 	        	</fileset>
 	    	</classpath>
 		</taskdef>
-		<pmd shortFilenames="true" 
-			cacheLocation="${build.pmdCacheDir}/cache"	>
+		<pmd cacheLocation="${build.pmdCacheDir}/cache"	>
 			<formatter type="xml" toFile="${build.reportsDir}/pmd_report-${app.version}-b.${build.number}.xml" toConsole="false"/>
         	<ruleset>${build.pmdRulesPath}</ruleset>
         	<fileset dir="src">
