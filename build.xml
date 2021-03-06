@@ -9,14 +9,17 @@
     <property name="build.classesDir" value="${build.buildDir}/classes" />
     <property name="build.artifactsDir" value="${build.buildDir}/artifacts" />
     <property name="build.reportsDir" value="build/reports" />
-    <property name="build.checkstyleRules" value="rules/google_checks.xml" />
-    <property name="build.pmdRules" value="rulesets/java/quickstart.xml" />
+    <property name="build.checkstyleRulesPath" value="${checkstyleRulesPath}" />
+    <property name="build.checkstyleClassPath" value="${checkstyleClassPath}" />
+    <property name="build.pmdRulesPath" value="${pmdRulesPath}" />
+    <property name="build.pmdclassPath" value="${pmdclassPath}" />
     <property name="build.pmdCacheDir" value="build/pmd/cache" />
-    <property name="build.checkstyleClassPath" value="checkstyle-8.41-all.jar" />
+    
+    <buildnumber/>
+    
+    <echo message="Build number: ${build.number}" level="info"/>
 
-   
-
-
+ 
     <!-- Delete all build files including artifacts -->
     <target name="pre-clean">
      	<delete dir="${build.buildDir}" />
@@ -36,8 +39,8 @@
 		    description="Generates a report of code convention violations."
 			depends="init-checks">
 		<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="	${build.checkstyleClassPath}" />
-		<buildnumber/>
-		<checkstyle config="${build.checkstyleRules}" >
+		
+		<checkstyle config="${build.checkstyleRulesPath}" >
 			<formatter type="xml" tofile="${build.reportsDir}/checkstyle_report-${app.version}-b.${build.number}.xml"/>
 			<fileset dir="src" includes="**/*.java"/>
 		</checkstyle>
@@ -46,11 +49,10 @@
     <target name="pmd" 
     	depends="init-checks"
     	description="Make static code analysis of sources">
-    	<buildnumber/>
     	<mkdir dir="${build.pmdCacheDir}" /> 
 	    <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
 	    	<classpath>
-	        	<fileset dir="/home/vkutas/epam/task1/java/pmd-bin-6.32.0/lib">
+	        	<fileset dir="${pmdclassPath}/lib">
 	            	<include name="*.jar"/>
 	        	</fileset>
 	    	</classpath>
@@ -58,7 +60,7 @@
 		<pmd shortFilenames="true" 
 			cacheLocation="${build.pmdCacheDir}/cache"	>
 			<formatter type="xml" toFile="${build.reportsDir}/pmd_report-${app.version}-b.${build.number}.xml" toConsole="true"/>
-        	<ruleset>${build.pmdRules}</ruleset>
+        	<ruleset>${build.pmdRulesPath}</ruleset>
         	<fileset dir="src">
             	<include name="**/*.java"/>
         	</fileset>
@@ -75,7 +77,6 @@
 
     <target name="jar" depends="compile">
     	<mkdir dir="${build.artifactsDir}" />
-    	<buildnumber/>
     	<jar destfile="${build.artifactsDir}/${app.name}-${app.version}-build.${build.number}.jar"
     		basedir="${build.buildDir}/classes">
     		<manifest>
