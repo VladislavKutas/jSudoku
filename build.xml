@@ -4,29 +4,80 @@
 	<property name="app.description" value="Java implementation of Sudoku game"/>
 	<property name="app.version" value="1.3"/>
 	<property name="app.mainClassName" value="oyg/sudoku/CreateSudokuGUI" />
-    <property name="sourceDir" value="src" />
-    <property name="outputDir" value="classes" />
-    <property name="artifactsDir" value="artifacts" />
-	     
+    <property name="build.sourceDir" value="src" />
+    <property name="build.buildDir" value="build" />
+    <property name="build.classesDir" value="${build.buildDir}/classes" />
+    <property name="build.artifactsDir" value="${build.buildDir}/artifacts" />
+    <property name="build.reportsDir" value="build/reports" />
+    <property name="build.checkstyleRules" value="rules/google_checks.xml" />
+    <property name="build.pmdRules" value="rulesets/java/quickstart.xml" />
+    <property name="build.pmdCacheDir" value="build/pmd/cache" />
+    <property name="build.checkstyleClassPath" value="checkstyle-8.41-all.jar" />
 
-    <target name="clean">
-     	<delete dir="${outputDir}" />
-     	<delete dir="${artifactsDir}" />
+   
+
+
+    <!-- Delete all build files including artifacts -->
+    <target name="pre-clean">
+     	<delete dir="${build.buildDir}" />
    	</target>
    	 
-    <target name="init" depends="clean">
-     	<mkdir dir="${outputDir}" />
-     	<mkdir dir="${artifactsDir}" />
+   	 <!-- Create required folders tree -->
+    <target name="init" depends="pre-clean">
+     	<mkdir dir="${build.buildDir}" />
     </target>
 
-   	<target name="compile" depends="init">
-    	<javac srcdir="${sourceDir}" destdir="${outputDir}" />
+    <target name="init-checks">
+     	<mkdir dir="${build.reportsDir}" />
+    </target>
+
+
+    <target name="checkstyle"
+		    description="Generates a report of code convention violations."
+			depends="init-checks">
+		<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="	${build.checkstyleClassPath}" />
+		<buildnumber/>
+		<checkstyle config="${build.checkstyleRules}" >
+			<formatter type="xml" tofile="${build.reportsDir}/checkstyle_report-${app.version}-b.${build.number}.xml"/>
+			<fileset dir="src" includes="**/*.java"/>
+		</checkstyle>
+  	</target>
+    
+    <target name="pmd" 
+    	depends="init-checks"
+    	description="Make static code analysis of sources">
+    	<buildnumber/>
+    	<mkdir dir="${build.pmdCacheDir}" /> 
+	    <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
+	    	<classpath>
+	        	<fileset dir="/home/vkutas/epam/task1/java/pmd-bin-6.32.0/lib">
+	            	<include name="*.jar"/>
+	        	</fileset>
+	    	</classpath>
+		</taskdef>
+		<pmd shortFilenames="true" 
+			cacheLocation="${build.pmdCacheDir}/cache"	>
+			<formatter type="xml" toFile="${build.reportsDir}/pmd_report-${app.version}-b.${build.number}.xml" toConsole="true"/>
+        	<ruleset>${build.pmdRules}</ruleset>
+        	<fileset dir="src">
+            	<include name="**/*.java"/>
+        	</fileset>
+        	<sourceLanguage name="java" version="1.6"/>
+    	</pmd>
+	</target>
+
+
+   	<target name="compile" 
+   		depends="init, checkstyle, pmd">
+   		<mkdir dir="${build.classesDir}" />
+    	<javac srcdir="${build.sourceDir}" destdir="${build.buildDir}/classes" />
     </target>
 
     <target name="jar" depends="compile">
+    	<mkdir dir="${build.artifactsDir}" />
     	<buildnumber/>
-    	<jar destfile="${artifactsDir}/${app.name}-${app.version}-build.${build.number}.jar"
-    		basedir="${outputDir}">
+    	<jar destfile="${build.artifactsDir}/${app.name}-${app.version}-build.${build.number}.jar"
+    		basedir="${build.buildDir}/classes">
     		<manifest>
 	    		<attribute name="Created-By" value="oyagev" />
 	            <attribute name="Specification-Title" value="${app.description}" />
@@ -41,7 +92,6 @@
     </target>
 
     <target name="post-clean" depends="compile, jar">
-    	<delete dir="${outputDir}" />
+    	<delete dir="${build.classesDir}" />
     </target>
-
 </project>
