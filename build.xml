@@ -19,27 +19,25 @@
     
     <echo message="Build number: ${build.number}" level="info"/>
 
- 
-    <!-- Delete all build files including artifacts -->
-    <target name="pre-clean">
+    <target name="pre-clean"
+    	description="Delete all build files including artifacts">
      	<delete dir="${build.buildDir}" />
    	</target>
    	 
-   	 <!-- Create required folders tree -->
-    <target name="init" depends="pre-clean">
+    <target name="init" depends="pre-clean"
+    	description="Create build directories tree">
      	<mkdir dir="${build.buildDir}" />
     </target>
 
-    <target name="init-checks">
+    <target name="init-checks"
+    	description="Create reports directory">
      	<mkdir dir="${build.reportsDir}" />
     </target>
 
 
-    <target name="checkstyle"
-		    description="Generates a report of code convention violations."
-			depends="init-checks">
-		<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="	${build.checkstyleClassPath}" />
-		
+    <target name="checkstyle" depends="init-checks"
+    	description="Generates a report of code convention violations.">
+		<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${build.checkstyleClassPath}" />
 		<checkstyle config="${build.checkstyleRulesPath}" >
 			<formatter type="xml" tofile="${build.reportsDir}/checkstyle_report-${app.version}-b.${build.number}.xml"/>
 			<fileset dir="src" includes="**/*.java"/>
@@ -59,7 +57,7 @@
 		</taskdef>
 		<pmd shortFilenames="true" 
 			cacheLocation="${build.pmdCacheDir}/cache"	>
-			<formatter type="xml" toFile="${build.reportsDir}/pmd_report-${app.version}-b.${build.number}.xml" toConsole="true"/>
+			<formatter type="xml" toFile="${build.reportsDir}/pmd_report-${app.version}-b.${build.number}.xml" toConsole="false"/>
         	<ruleset>${build.pmdRulesPath}</ruleset>
         	<fileset dir="src">
             	<include name="**/*.java"/>
@@ -70,12 +68,14 @@
 
 
    	<target name="compile" 
-   		depends="init, checkstyle, pmd">
+   		depends="init, checkstyle, pmd"
+   		description="Compile java sources">
    		<mkdir dir="${build.classesDir}" />
     	<javac srcdir="${build.sourceDir}" destdir="${build.buildDir}/classes" />
     </target>
 
-    <target name="jar" depends="compile">
+    <target name="jar" depends="compile"
+    	description="Make executable jar">
     	<mkdir dir="${build.artifactsDir}" />
     	<jar destfile="${build.artifactsDir}/${app.name}-${app.version}-build.${build.number}.jar"
     		basedir="${build.buildDir}/classes">
@@ -92,7 +92,9 @@
     	</jar>
     </target>
 
-    <target name="post-clean" depends="compile, jar">
+    <target name="post-clean" depends="compile, jar"
+    	description="Clean compile directory and pmd cache">
     	<delete dir="${build.classesDir}" />
+    	<delete dir="${build.pmdCacheDir}" />
     </target>
 </project>
